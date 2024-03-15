@@ -1,75 +1,77 @@
+import os
+from fastapi import FastAPI, HTTPException
+import numpy as np
+from pydantic import BaseModel
+from typing import Tuple
 from models.embedding_generator import OpenAIEmbeddingGenerator
 from models.nearest_neighbors_search import NearestNeighborsSearch
 from services.llm_handler import LLMHandler
-from utils.metadata_manager import MetadataManager
-
-import numpy as np
-import pandas as pd
-import os
 from openai import OpenAI
-from pathlib import Path
 
+app = FastAPI()
 
-def main():
-    # Assuming client and generator setup
-    OpenAI.api_key = os.getenv('OPENAI_API_KEY')
-    client = OpenAI()
-    model = "text-embedding-3-large"
-    embedding_generator = OpenAIEmbeddingGenerator(client, model)
+class Query(BaseModel):
+    text: str
 
-    metadata_file = Path('metadata.json')
-    metadata_manager = MetadataManager(metadata_file)
-    nn_search = NearestNeighborsSearch()
-    llm_handler = LLMHandler(model)
-    embeddings_file = Path('vector_database.ann')
+# Initialize your classes outside the endpoint function to avoid re-initializing them on each request
+OpenAI.api_key = os.getenv('OPENAI_API_KEY')
+openai_client = OpenAI() # Make sure to securely manage your API key
+model = "text-embedding-3-large"
+embedding_generator = OpenAIEmbeddingGenerator(openai_client, model)
+nn_search = NearestNeighborsSearch()
 
-    if embeddings_file.exists() and metadata_file.exists():
-        # Load the metadata
-        video_ids, text_chunks_info = metadata_manager.load_metadata()
-        # Load your embeddings directly, since we're assuming they're precomputed
-        # This part is left as an exercise to the reader, as it depends on how you've stored your embeddings
-    else:
-        # df = pd.read_json('data/combined_transcriptions_with_embeddings.json')
-        df = pd.read_json('data/combined_transcriptions_with_embeddings_text-embedding-3-large.json')
+nn_search.load_data() # Assume this is preloaded with your embeddings data
+llm_handler = LLMHandler(model)
+youtube_url_watch = "https://www.youtube.com/watch?v"
+
+@app.post("/find_best_match/")
+async def find_best_match(query: Query):
+    try:
+        # Generate the query embedding
+        query_embedding = embedding_generator.generate_embedding(query.text)
         
-        embeddings = []
-        video_ids = []
-        text_chunks_info = []
-
-        for _, row in df.iterrows():
-            for chunk in row['text_chunks']:
-                embeddings.append(chunk['embedding'])
-                video_ids.append(row['videoId'])
-                text_chunks_info.append((chunk['start_time'], chunk['chunk_text']))
-
-        # Save the metadata for future use
-        metadata_manager.save_metadata(video_ids, text_chunks_info)
-
-    embeddings_np = np.array(embeddings)
-    nn_search.video_ids = video_ids
-    nn_search.text_chunks_info = text_chunks_info
-    # Assume embeddings_np is available
-    nn_search.fit(embeddings_np)
-
-    # Example query
-    input_text = "it's the worst one v one keeping the ball up history"
-    input_text = "worst we've seen in keeping the ball up history in one v one"
-    input_text = "worst one v one keeping the ball up"
-    input_text = "keeping the ball up competition fail"
-    input_text = "keep ball up fail"
-    # input_text = "zen is scoring against mawkzy"
-    # input_text = "someone says disgusting several times"
-    query_embedding = embedding_generator.generate_embedding(input_text)
-    nearest_info = nn_search.find_nearest(np.array([query_embedding]))
-
-    for video_id, timestamp, text in nearest_info:
-        print(f"Video ID: {video_id}, Timestamp: {timestamp}, Text: {text}")
-
-    best_match = llm_handler.find_best_match(input_text, nearest_info)
-
-    video_id, timestamp, output_text = best_match
-    print(f"Best Match Video ID: {video_id}, Timestamp: {timestamp}, Text: {output_text}")
+        # Find the nearest neighbors
+        nearest_info = nn_search.find_nearest(np.array([query_embedding]))
+        
+        # Use the LLM to determine the best match
+        video_id, timestamp, output_text = llm_handler.find_best_match(query.text, nearest_info)
+        timestamp_formatted = format_timestamp(timestamp)
+        # Assuming best_match returns video_id and timestamp
+        return {"video_id": video_id, "timestamp": timestamp, "url_with_timestamp": f"{youtube_url_watch}={video_id}&t={timestamp_formatted}"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 
-if __name__ == "__main__":
-    main()
+
+# The process_query function is now integrated within the find_best_match endpoint function.
+    
+def format_timestamp(timestamp: str) -> str:
+    """
+    Dynamically format a timestamp, appending 'h', 'm', and 's' to the respective parts.
+    Handles both HH:MM:SS and MM:SS formats correctly, omitting leading zeros for hours.
+    
+    Args:
+    - timestamp (str): The timestamp in HH:MM:SS or MM:SS format.
+    
+    Returns:
+    - str: A formatted duration string, e.g., "1h30m30s" or "23m45s".
+    """
+    parts = timestamp.split(':')
+    formatted_parts = []
+
+    # Depending on the number of parts, append the correct suffix.
+    if len(parts) == 3:
+        # If hours are present
+        if int(parts[0]) > 0:  # Only append hours if it's more than 0
+            formatted_parts.append(parts[0] + 'h')
+        formatted_parts.append(parts[1] + 'm')
+    elif len(parts) == 2:
+        # If hours are not present
+        formatted_parts.append(parts[0] + 'm')
+    else:
+        raise ValueError("Timestamp format is incorrect. Expected HH:MM:SS or MM:SS.")
+
+    # Seconds are always present and processed the same way
+    formatted_parts.append(parts[-1] + 's')
+    
+    return ''.join(formatted_parts)
