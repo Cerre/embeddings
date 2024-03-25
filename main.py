@@ -19,8 +19,8 @@ openai_client = OpenAI() # Make sure to securely manage your API key
 model = "text-embedding-3-large"
 embedding_generator = OpenAIEmbeddingGenerator(openai_client, model)
 nn_search = NearestNeighborsSearch()
-
-nn_search.load_data() # Assume this is preloaded with your embeddings data
+data_path = 'data/combined_transcriptions_with_embeddings_text-embedding-3-large.json'
+nn_search.load_data(data_path) # Assume this is preloaded with your embeddings data
 llm_handler = LLMHandler(model)
 youtube_url_watch = "https://www.youtube.com/watch?v"
 
