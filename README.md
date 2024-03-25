@@ -19,9 +19,12 @@ Follow these steps to get your development environment set up:
 
    Download the required large file from Google Drive:
 
-   [Download Large File](https://drive.google.com/yourfilelink)
+   [Download Large File](https://drive.google.com/file/d/1MzT5x84FK-TX6UQfFHL2Bcy0GprK-rnw/view?usp=drive_link)
 
-   Place it in the appropriate directory as per your project structure.
+    ```bash
+   mkdir data/
+    ```
+    Place file in data
 
 3. **Set up a virtual environment:**
 
@@ -43,6 +46,12 @@ Follow these steps to get your development environment set up:
 
    ```bash
    pip install -r requirements.txt
+   ```
+
+5. **Set up openai api key:**
+
+   ```bash
+   export OPENAI_API_KEY=YOUR_API_KEY
    ```
 
 ## Running the Application
