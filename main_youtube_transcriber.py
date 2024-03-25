@@ -56,6 +56,7 @@ def _get_cuda_toolkit_path():
 async def main():
     # video_selector = VideoSelector(single_video_url="https://www.youtube.com/watch?v=PC8iEn8bdl8")
     video_selector = VideoSelector(single_video_url="https://www.youtube.com/watch?v=beAvFHP4wDI")
+    video_selector = VideoSelector(url_list_path="/mnt/d/wsl_root/dev/embeddings/channel_videos_short.csv")
     
     videos = video_selector.get_videos()
     device, compute_type = setup_cuda()
