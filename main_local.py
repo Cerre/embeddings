@@ -12,16 +12,16 @@ from pathlib import Path
 
 def main():
     # Assuming client and generator setup
-    OpenAI.api_key = os.getenv('OPENAI_API_KEY')
+    OpenAI.api_key = os.getenv("OPENAI_API_KEY")
     client = OpenAI()
     model = "text-embedding-3-large"
     embedding_generator = OpenAIEmbeddingGenerator(client, model)
 
-    metadata_file = Path('metadata.json')
+    metadata_file = Path("metadata.json")
     metadata_manager = MetadataManager(metadata_file)
     nn_search = NearestNeighborsSearch()
     llm_handler = LLMHandler(model)
-    embeddings_file = Path('vector_database.ann')
+    embeddings_file = Path("vector_database.ann")
 
     if embeddings_file.exists() and metadata_file.exists():
         # Load the metadata
@@ -30,17 +30,19 @@ def main():
         # This part is left as an exercise to the reader, as it depends on how you've stored your embeddings
     else:
         # df = pd.read_json('data/combined_transcriptions_with_embeddings.json')
-        df = pd.read_json('data/combined_transcriptions_with_embeddings_text-embedding-3-large.json')
-        
+        df = pd.read_json(
+            "data/combined_transcriptions_with_embeddings_text-embedding-3-large.json"
+        )
+
         embeddings = []
         video_ids = []
         text_chunks_info = []
 
         for _, row in df.iterrows():
-            for chunk in row['text_chunks']:
-                embeddings.append(chunk['embedding'])
-                video_ids.append(row['videoId'])
-                text_chunks_info.append((chunk['start_time'], chunk['chunk_text']))
+            for chunk in row["text_chunks"]:
+                embeddings.append(chunk["embedding"])
+                video_ids.append(row["videoId"])
+                text_chunks_info.append((chunk["start_time"], chunk["chunk_text"]))
 
         # Save the metadata for future use
         metadata_manager.save_metadata(video_ids, text_chunks_info)
@@ -68,7 +70,9 @@ def main():
     best_match = llm_handler.find_best_match(input_text, nearest_info)
 
     video_id, timestamp, output_text = best_match
-    print(f"Best Match Video ID: {video_id}, Timestamp: {timestamp}, Text: {output_text}")
+    print(
+        f"Best Match Video ID: {video_id}, Timestamp: {timestamp}, Text: {output_text}"
+    )
 
 
 if __name__ == "__main__":

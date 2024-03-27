@@ -2,6 +2,7 @@ import os
 from openai import OpenAI
 from typing import List, Tuple
 
+
 class LLMHandler:
     def __init__(self, model: str = "gpt-3.5-turbo"):
         self.model = model
@@ -9,7 +10,9 @@ class LLMHandler:
         # Initialize the OpenAI client with your API key
         self.client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
-    def find_best_match(self, query: str, options: List[Tuple[str, str, str]]) -> Tuple[str, str, str]:
+    def find_best_match(
+        self, query: str, options: List[Tuple[str, str, str]]
+    ) -> Tuple[str, str, str]:
         """
         Craft a prompt to send to the LLM and interpret its response to find the best match.
         """
@@ -36,7 +39,7 @@ class LLMHandler:
             # Extract the response text
             response_text = chat_completion.choices[0].message.content
             # Extracting the first digit as the chosen option, assuming the LLM responds with something like "Option 1 is the best match."
-            best_option_number = int(''.join(filter(str.isdigit, response_text)))
+            best_option_number = int("".join(filter(str.isdigit, response_text)))
             best_match = options[best_option_number]
         except (IndexError, ValueError, KeyError) as e:
             print(f"Error processing the LLM response: {e}")
