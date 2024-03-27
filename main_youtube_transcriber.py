@@ -57,12 +57,12 @@ def _get_cuda_toolkit_path():
 
 async def main():
     # video_selector = VideoSelector(single_video_url="https://www.youtube.com/watch?v=PC8iEn8bdl8")
-    video_selector = VideoSelector(
-        url_list_path="/mnt/d/wsl_root/dev/embeddings/channel_videos_short.csv"
-    )
     # video_selector = VideoSelector(
-    #     single_video_url="https://www.youtube.com/watch?v=beAvFHP4wDI"
-    # )  # 1 minute clip
+    #     url_list_path="/mnt/d/wsl_root/dev/embeddings/channel_videos_short.csv"
+    # )
+    video_selector = VideoSelector(
+        single_video_url="https://www.youtube.com/watch?v=beAvFHP4wDI"
+    )  # 1 minute clip
 
     videos = video_selector.get_videos()
     device, compute_type = setup_cuda()
@@ -72,13 +72,13 @@ async def main():
     # 249 seconds for channel_videos_short.csv for WhisperTranscriber tiny.en
     # 1341 seconds for large-v3
     
-    transcriber = WhisperxTranscriber(
-        model_name="tiny.en",
-        device=device,
-        output_dir="transcripts",
-        compute_type=compute_type,
-        batch_size=128,
-    )
+    # transcriber = WhisperxTranscriber(
+    #     model_name="tiny.en",
+    #     device=device,
+    #     output_dir="transcripts",
+    #     compute_type=compute_type,
+    #     batch_size=128,
+    # )
     # Total time for whisperX was 118 seconds for channel_videos_short.csv. tiny.en. Batch 32
     # 
     # 79 seconds with batch 2048

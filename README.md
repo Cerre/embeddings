@@ -44,6 +44,17 @@ Follow these steps to get your development environment set up:
 
 4. **Install dependencies:**
 
+   If you want to try whisperx:
+
+   ```bash
+      git clone https://github.com/m-bain/whisperX.git
+      cd whisperX
+      pip install -e .
+      cd ..
+   ```
+
+
+
    ```bash
    pip install -r requirements.txt
    ```
@@ -58,7 +69,7 @@ Follow these steps to get your development environment set up:
 
 
 ```bash
-uvicorn main:app --reload
+uvicorn main:app
 ```
 
 This will start the Uvicorn server with auto-reload enabled.
@@ -72,5 +83,5 @@ This will open the fastapi docs interface where you can try out different API en
 ## Download and transcribe audio from youtube
 
 ```bash
-python main_youtube_transcriber
+python main_youtube_transcriber.py
 ```
