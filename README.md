@@ -54,9 +54,8 @@ Follow these steps to get your development environment set up:
    export OPENAI_API_KEY=YOUR_API_KEY
    ```
 
-## Running the Application
+## Running and testing the Api
 
-After installing the dependencies, you can run the application with the following command:
 
 ```bash
 uvicorn main:app --reload
@@ -64,10 +63,14 @@ uvicorn main:app --reload
 
 This will start the Uvicorn server with auto-reload enabled.
 
-## Testing the API
-
 Once the application is running, you can test the API by navigating to:
 
 [http://localhost:8000/docs](http://localhost:8000/docs)
 
 This will open the fastapi docs interface where you can try out different API endpoints.
+
+## Download and transcribe audio from youtube
+
+```bash
+python main_youtube_transcriber
+```
