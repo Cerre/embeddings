@@ -1,0 +1,9 @@
+Metadata-Version: 2.1
+Name: youtube_channel_search
+Version: 0.1.0
+Summary: A brief description of the project
+Author-email: Your Name <your.email@example.com>
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: scikit-learn
+Requires-Dist: openai

@@ -1,7 +1,7 @@
 import asyncio
 from video_selection.video_selector import VideoSelector
 from downloads.downloader import Downloader
-from transcription.transcriber import WhisperTranscriber, WhisperxTranscriber
+from transcription.transcriber import WhisperTranscriber#, WhisperxTranscriber
 from text_processing.text_processor import TextProcessor, clean_filename
 import os
 from numba import cuda
@@ -13,13 +13,12 @@ async def process_video(video, downloader, transcriber, text_processor):
     if audio_path:
         audio_file_name = clean_filename(video.title)
         transcript, metadata_dicts = await transcriber.transcribe_audio(audio_path)
-        # sentences = text_processor.sophisticated_sentence_splitter(transcript)
-        # print(audio_file_name)
-        # print(transcript)
-        # print(metadata_dicts)
-        # breakpoint()
         text_processor.save_processed_data(audio_file_name, transcript, metadata_dicts)
+        # Combine text to 1 minute chunks with overlap.
+        # Create embeddings
+        # Upload to database
         print(f"Transcript: {transcript}\n\n")
+        print()
     else:
         print(f"Failed to download audio for video: {video.title}")
 
