@@ -1,5 +1,5 @@
 import re
-import spacy
+# import spacy
 from pathlib import Path
 import pandas as pd
 
@@ -9,7 +9,7 @@ class TextProcessor:
         self.use_spacy = use_spacy
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
-        self.nlp = self.download_spacy_model()
+        # self.nlp = self.download_spacy_model()
 
     def sophisticated_sentence_splitter(self, text):
         text = self.remove_pagination_breaks(text)

@@ -21,6 +21,7 @@ def initialize_components():
     nn_search = NearestNeighborsSearch()
     data_path = "data/combined_transcriptions_with_embeddings_text-embedding-3-large.json"
     nn_search.load_data(data_path)  # Assume this is preloaded with your embeddings data
+    breakpoint()
     llm_handler = LLMHandler(model)
     return embedding_generator, nn_search, llm_handler
 
