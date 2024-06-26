@@ -1,0 +1,3 @@
+*.pyc
+.env
+/downloaded_audio
